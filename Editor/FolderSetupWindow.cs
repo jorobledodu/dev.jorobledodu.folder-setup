@@ -38,7 +38,7 @@ namespace jorobledodu.folderSetup
 
             GUILayout.Label("Folder Setup Wizard", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
-                "Write folders easily: use bullets (-) + indent, one path per line (Assets/Art/Sprites), classic ├/└ tree, or JSON.",
+                "Write folders easily.",
                 MessageType.Info
             );
 
