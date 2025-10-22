@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Jorobledodu.FolderSetup
+namespace jorobledodu.folderSetup
 {
     public class FolderSetupWindow : EditorWindow
     {
