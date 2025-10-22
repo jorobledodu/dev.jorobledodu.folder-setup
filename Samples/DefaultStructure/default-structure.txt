@@ -1,0 +1,25 @@
+Assets
+- Art
+  - Sprites
+  - Atlases
+- Materials
+  - URP2D
+  - Physics2D
+- Scenes
+  - 01_Prototype.unity
+  - 02_LevelEditor.unity
+- Prefabs
+  - Environment
+    - Platforms_Movable
+    - Hazards
+    - Ladders_Climbables
+  - Player
+- Scripts
+  - Level
+    - Tilemap
+    - Grid
+    - Tiles
+  - Rendering
+  - Player
+- Settings
+  - URP_Asset.asset
