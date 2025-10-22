@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace jorobledodu.folderSetup
+namespace Jorobledodu.FolderSetup
 {
     public class FolderSetupWindow : EditorWindow
     {
@@ -17,7 +17,7 @@ namespace jorobledodu.folderSetup
         private Vector2 _scroll;
         private bool _createGitkeep = true;
 
-        // Deferred actions flags
+        // Deferred flags
         private bool _doLoadSample;
         private bool _doCreate;
         private bool _doDelete;
@@ -27,52 +27,51 @@ namespace jorobledodu.folderSetup
 - Art
 - Materials
 - Scenes
-    - 00_gym.unity
+  - 00_Gym.unity
 - Prefabs
 - Scripts";
 
         void OnGUI()
         {
-            // Defensive
             if (_structureText == null)
                 _structureText = string.Empty;
 
             GUILayout.Label("Folder Setup Wizard", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("Write folders easily.", MessageType.Info);
+            EditorGUILayout.HelpBox(
+                "Write folders easily: use bullets (-) + indent, one path per line (Assets/Art/Sprites), classic ├/└ tree, or JSON.",
+                MessageType.Info
+            );
 
             _createGitkeep = EditorGUILayout.ToggleLeft(
                 "Create .gitkeep in empty folders",
                 _createGitkeep
             );
 
-            // Row: Load Sample / Clear  (no returns inside)
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load Sample"))
-                _doLoadSample = true;
-            if (GUILayout.Button("Clear"))
-                _structureText = string.Empty;
-            EditorGUILayout.EndHorizontal();
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Load Sample"))
+                    _doLoadSample = true;
+                if (GUILayout.Button("Clear"))
+                    _structureText = string.Empty;
+            }
 
-            // Scroll area
-            _scroll = EditorGUILayout.BeginScrollView(_scroll);
-            _structureText = EditorGUILayout.TextArea(
-                _structureText,
-                GUILayout.MinHeight(180) // no ExpandHeight inside scroll
-            );
-            EditorGUILayout.EndScrollView();
+            using (var scroll = new EditorGUILayout.ScrollViewScope(_scroll))
+            {
+                _scroll = scroll.scrollPosition;
+                _structureText = EditorGUILayout.TextArea(_structureText, GUILayout.MinHeight(180));
+            }
 
             GUILayout.Space(8);
 
-            // Row: Create / Delete  (defer actions)
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Create Folders & Files", GUILayout.Height(30)))
-                _doCreate = true;
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Create Folders & Files", GUILayout.Height(30)))
+                    _doCreate = true;
+                if (GUILayout.Button("Delete Folders", GUILayout.Height(30)))
+                    _doDelete = true;
+            }
 
-            if (GUILayout.Button("Delete Folders", GUILayout.Height(30)))
-                _doDelete = true;
-            EditorGUILayout.EndHorizontal();
-
-            // ---- Execute deferred actions AFTER all layout groups are closed ----
+            // Execute deferred actions outside layout scopes
             if (_doLoadSample)
             {
                 _doLoadSample = false;
@@ -90,8 +89,6 @@ namespace jorobledodu.folderSetup
                 SafeTryDelete();
             }
         }
-
-        // ---- Safe wrappers (catch exceptions so layout never breaks) ----
 
         void SafeTryCreate()
         {
@@ -124,7 +121,6 @@ namespace jorobledodu.folderSetup
         {
             try
             {
-                // First confirmation (outside of any layout group)
                 bool proceed = EditorUtility.DisplayDialog(
                     "Delete folders",
                     "This will delete the folders referenced in the structure under 'Assets/'. Are you sure?",
@@ -156,9 +152,9 @@ namespace jorobledodu.folderSetup
                     int choice = EditorUtility.DisplayDialogComplex(
                         "Content has been detected in the folders",
                         "Some folders contain files. How do you want to proceed?",
-                        "Delete content", // 0
-                        "Do not delete content", // 1
-                        "Cancel" // 2
+                        "Delete content",
+                        "Do not delete content",
+                        "Cancel"
                     );
                     if (choice == 2)
                         return;
@@ -179,16 +175,61 @@ namespace jorobledodu.folderSetup
         {
             try
             {
+                // 1) Try the package cache path
+                string projectRoot = Application.dataPath.Substring(
+                    0,
+                    Application.dataPath.LastIndexOf("Assets")
+                );
+                string packageCacheRoot = Path.Combine(projectRoot, "Library", "PackageCache");
+                string initialDir = null;
+
+                if (Directory.Exists(packageCacheRoot))
+                {
+                    var dirs = Directory.GetDirectories(
+                        packageCacheRoot,
+                        "dev.jorobledodu.folder-setup@*"
+                    );
+                    if (dirs.Length > 0)
+                    {
+                        // choose the latest modified
+                        string pkgFolder = dirs.OrderByDescending(d =>
+                                Directory.GetLastWriteTime(d)
+                            )
+                            .First();
+                        string sampleFolder = Path.Combine(pkgFolder, "Samples~");
+                        if (Directory.Exists(sampleFolder))
+                            initialDir = sampleFolder;
+                    }
+                }
+
+                // 2) Fallback: Assets/Samples/dev.jorobledodu.folder-setup/
+                if (initialDir == null)
+                {
+                    string fallback2 = Path.Combine(
+                        Application.dataPath,
+                        "Samples",
+                        "dev.jorobledodu.folder-setup"
+                    );
+                    if (Directory.Exists(fallback2))
+                        initialDir = fallback2;
+                }
+
+                // 3) Fallback: Assets/
+                if (initialDir == null)
+                {
+                    initialDir = Application.dataPath;
+                }
+
 #if UNITY_2020_1_OR_NEWER
                 string path = EditorUtility.OpenFilePanelWithFilters(
                     "Select structure file (.txt or .json)",
-                    Application.dataPath,
+                    initialDir,
                     new string[] { "Text or JSON", "txt,json", "All files", "*" }
                 );
 #else
                 string path = EditorUtility.OpenFilePanel(
                     "Select structure file (.txt or .json)",
-                    Application.dataPath,
+                    initialDir,
                     ""
                 );
 #endif

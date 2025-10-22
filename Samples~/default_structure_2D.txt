@@ -1,0 +1,21 @@
+Assets
+- Art
+  - Sprites
+  - Atlases
+- Materials
+- Scenes
+  - 00_Gym.unity
+- Prefabs
+  - Environment
+  - Hazards
+  - Player
+- Scripts
+  - Level
+  - Rendering
+  - Player
+- UI
+  - Canvases
+  - Sprites
+- Audio
+  - Music
+  - SFX

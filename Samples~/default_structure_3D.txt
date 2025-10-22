@@ -1,0 +1,19 @@
+Assets
+- Art
+  - Models
+  - Textures
+- Materials
+- Scenes
+  - 00_Gym.unity
+- Prefabs
+  - Environment
+  - Props
+- Scripts
+  - Core
+  - Gameplay
+- UI
+  - Canvases
+  - Sprites
+- Audio
+  - Music
+  - SFX
