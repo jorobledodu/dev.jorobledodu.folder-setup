@@ -73,7 +73,7 @@ Assets
 3. Paste this URL:
 
 ```
-https://github.com/jorobledodu/dev.jorobledodu.folder-setup.git#v1.0.0
+https://github.com/jorobledodu/dev.jorobledodu.folder-setup.git
 ```
 
 ---
