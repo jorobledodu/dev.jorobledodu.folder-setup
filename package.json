@@ -1,7 +1,7 @@
 {
   "name": "dev.jorobledodu.folder-setup",
   "displayName": "Folder Setup Wizard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "unity": "6000.0",
   "description": "Create and delete folder structures from a simple text definition (bullets/indent, paths, classic tree, or JSON).",
   "author": {
@@ -9,11 +9,16 @@
     "url": "https://github.com/jorobledodu"
   },
   "keywords": ["folders", "setup", "structure", "wizard", "editor"],
-  "samples": [
-    {
-      "displayName": "Default Structure",
-      "description": "A simple bullet-indented example structure.",
-      "path": "Samples/DefaultStructure"
-    }
-  ]
+"samples": [
+  {
+    "displayName": "Default Structure 2D",
+    "description": "Bullet-indented example for 2D projects.",
+    "path": "Samples~/DefaultStructure2D"
+  },
+  {
+    "displayName": "Default Structure 3D",
+    "description": "Bullet-indented example for 3D projects.",
+    "path": "Samples~/DefaultStructure3D"
+  }
+]
 }
